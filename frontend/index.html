@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harsha AI Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #020810;
+    color: #e2e8f0;
+    font-family: 'Space Mono', monospace;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .center {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .badge {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: #00ffe7;
+    border: 1px solid rgba(0,255,231,0.3);
+    padding: 0.3rem 1rem;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #00ffe7;
+    border-radius: 50%;
+    animation: blink 1.4s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  h1 {
+    font-family: 'Major Mono Display', monospace;
+    font-size: clamp(2.2rem, 7vw, 5rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  h1 span { color: #00ffe7; }
+
+  .sub {
+    font-size: 0.75rem;
+    color: #475569;
+    letter-spacing: 0.1em;
+    max-width: 340px;
+    line-height: 1.8;
+  }
+
+  .sub em {
+    color: #64748b;
+    font-style: normal;
+  }
+
+  .status {
+    font-size: 0.62rem;
+    color: #475569;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 0.5rem;
+  }
+
+  .status-item { display: flex; align-items: center; gap: 0.4rem; }
+  .status-item .dot { width: 5px; height: 5px; border-radius: 50%; }
+  .dot-green { background: #4ade80; }
+  .dot-amber { background: #fbbf24; }
+  .dot-gray  { background: #475569; }
+
+  .divider {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, rgba(0,255,231,0.3), transparent);
+    margin: 0.5rem 0;
+  }
+
+  .link {
+    font-size: 0.62rem;
+    color: #475569;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.2s;
+  }
+  .link:hover { color: #00ffe7; }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div class="center">
+  <div class="badge">BUILDING IN PUBLIC</div>
+
+  <h1>Harsha<br><span>AI Lab</span></h1>
+
+  <div class="divider"></div>
+
+  <p class="sub">
+    A personal sandbox for AI experiments.<br>
+    <em>tools · simulations · hardware × intelligence</em>
+  </p>
+
+  <div class="status">
+    <div class="status-item">
+      <div class="dot dot-green"></div>
+      <span>ACTIVE</span>
+    </div>
+    <div class="status-item">
+      <div class="dot dot-amber"></div>
+      <span>EXPERIMENTS: 6</span>
+    </div>
+    <div class="status-item">
+      <div class="dot dot-gray"></div>
+      <span>POST-EXAM BUILD</span>
+    </div>
+  </div>
+
+  <a href="https://polaharsha.com" class="link">← back to portfolio</a>
+</div>
+
+<script>
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function init() {
+    nodes = Array.from({ length: 60 }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 1.2 + 0.4
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 150) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(0,255,231,${(1 - d / 150) * 0.18})`;
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+    for (const n of nodes) {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,255,231,0.45)';
+      ctx.fill();
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > W) n.vx *= -1;
+      if (n.y < 0 || n.y > H) n.vy *= -1;
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); init(); });
+  resize(); init(); draw();
+</script>
+</body>
+</html>
